@@ -12,10 +12,11 @@ public class HurtBox : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         //hvis den collider med en collider med tagget "Bullet" så dør enemien.
-        if (collision.gameObject.tag == "Bullet")
+        if (collision.gameObject.tag == "Bullet" && !animController.GetBool("death"))
         {
             //spiller animationenen death og dør efter animationen.
             Debug.Log("death!");
+            Stats.Instance?.RecordEnemyKilled("BlockingDude", blockingDude.transform.position);
             animController.SetBool("death", true);
             Destroy(blockingDude, 1f);
         }

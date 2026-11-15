@@ -49,6 +49,7 @@ public class Weapon : MonoBehaviour
         {
             // Set canShoot to false to prevent starting another burst before the current one is complete
             canShoot = false;
+            Stats.Instance?.RecordShotBurst(direction, burstShots);
 
             // Loop through the specified number of shots in the burst
             for (int i = 0; i < burstShots; i++)
@@ -65,6 +66,10 @@ public class Weapon : MonoBehaviour
 
             // Set canShoot back to true, allowing the player to initiate another burst after the cooldown period
             canShoot = true;
+        }
+        else
+        {
+            Stats.Instance?.RecordShotOnCooldown();
         }
     }
 

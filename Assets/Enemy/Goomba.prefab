@@ -103,7 +103,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   raycastPivot: {fileID: 2837700257824247936}
   walkSpeed: 1
-  raycastDistance: 1
+  floorRaycastDistance: 1.5
+  wallRaycastDistance: 0.1
 --- !u!50 &7082148169784164519
 Rigidbody2D:
   serializedVersion: 4

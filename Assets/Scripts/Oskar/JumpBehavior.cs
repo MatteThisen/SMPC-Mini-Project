@@ -29,6 +29,7 @@ public class JumpBehavior : MonoBehaviour
         //checks if the player is allowed to jump, "Jump" is the new inputs systems spacebar.
         if (Input.GetButtonDown("Jump") && isGrounded())
         {
+            Stats.Instance?.RecordJump();
 
             //makes a new vector that keeps the rb x position but pushes the y with jumpPower
             rb.velocity = new Vector2(rb.velocity.x, jumpPower);
@@ -37,7 +38,11 @@ public class JumpBehavior : MonoBehaviour
             animator.SetBool("isJumping", true);
         }
 
-        else animator.SetBool("isJumping", false);
+        else
+        {
+            animator.SetBool("isJumping", false);
+            if (Input.GetButtonDown("Jump")) Stats.Instance?.RecordJumpAttemptWhileAirborne();
+        }
 
         if (rb.velocity.y < fallingOffSet)
         {

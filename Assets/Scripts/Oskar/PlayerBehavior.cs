@@ -12,13 +12,20 @@ public class PlayerBehaviour : MonoBehaviour
     private float offSet = 0.1f;
 
     public Rigidbody2D rb;
-    public StarManager starManager;
+    //public StarManager starManager;
     private Animator Animator;
+    [SerializeField] private Checkpoints checkpointManager;
 
 
     private void Awake()
     {
         Animator = GetComponent<Animator>();
+    }
+
+    private void Start()
+    {
+        // Let the stats tracker follow this player
+        Stats.Instance?.RegisterPlayer(transform);
     }
 
     //called every frame
@@ -45,10 +52,22 @@ public class PlayerBehaviour : MonoBehaviour
         // if the gameobject that collides has the tag collectable
         if (other.gameObject.CompareTag("Collectable"))
         {
+            // Collect it (activates the checkpoint if it is one). Skip if already picked up this frame.
+            RotationCollectable collectable = other.GetComponent<RotationCollectable>();
+            if (collectable != null && !collectable.Collect()) return;
+
+            // Log the pickup (and the checkpoint, if this collectable is one)
+            if (Stats.Instance != null)
+            {
+                Stats.Instance.RecordCollectable(other.gameObject.name);
+                if (collectable != null && collectable.IsCheckpoint)
+                    Stats.Instance.RecordCheckpoint(collectable.CheckpointIndex);
+            }
+
             //destroy the gameobjecet
             Destroy(other.gameObject);
             //plus one in starmangager starCount
-            starManager.starCount++;
+            //starManager.starCount++;
             //get sound in the audio source component
             AudioSource audio = GetComponent<AudioSource>();
             //and play that sound
@@ -61,16 +80,20 @@ public class PlayerBehaviour : MonoBehaviour
         if (collision.gameObject.tag == "Enemy")
         {
             Debug.Log("You Died :(");
+            Stats.Instance?.RecordDeath(collision.gameObject.name, transform.position);
             // Reset the game by reloading the current scene when the player hits an enemy and dies
-            ReloadScene();
+            //ReloadScene();
+
+            transform.position = checkpointManager.playerSpawnpoint.position;
+            rb.velocity = Vector2.zero; // Reset the player's velocity to prevent sliding after respawn
         }
     }
 
 
-    void ReloadScene()
-    {
-        // Reload the current scene
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
+    //void ReloadScene()
+    //{
+    //    // Reload the current scene
+    //    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    //}
 
 }
